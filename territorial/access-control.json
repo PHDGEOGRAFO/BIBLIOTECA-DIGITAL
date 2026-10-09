@@ -1,0 +1,8 @@
+{
+  "version": "0.6.39",
+  "session_key": "gis_stgo_biblioteca_territorial_email",
+  "allowed_emails": [
+    "phernandez@munistgo.cl"
+  ],
+  "note": "Control de previsualización estático. La publicación interna definitiva requiere autenticación en servidor o proveedor de identidad."
+}
