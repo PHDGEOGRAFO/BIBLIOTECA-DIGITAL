@@ -13,6 +13,7 @@ from dbfread import DBF
 from fastapi import FastAPI, Header, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
+import google.auth
 from google.auth.transport.requests import Request
 from google.oauth2 import id_token
 from googleapiclient.discovery import build
@@ -47,7 +48,8 @@ def authenticate(authorization: str | None):
 
 def drive():
     # Application Default Credentials de Cloud Run: acceso de lectura concedido a su cuenta de servicio.
-    return build("drive", "v3", cache_discovery=False)
+    credentials, _ = google.auth.default(scopes=["https://www.googleapis.com/auth/drive.readonly"])
+    return build("drive", "v3", credentials=credentials, cache_discovery=False)
 
 def metadata(api, file_id):
     return api.files().get(fileId=file_id, fields="id,name,mimeType,size,parents,trashed", supportsAllDrives=True).execute()
