@@ -1,0 +1,6 @@
+{
+  "apiBase": "",
+  "googleClientId": "",
+  "authRequired": true,
+  "explanation": "Configurar únicamente URL pública del servicio y OAuth Client ID; nunca secretos."
+}
