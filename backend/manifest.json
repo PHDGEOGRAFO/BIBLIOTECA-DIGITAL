@@ -1,0 +1,161 @@
+{
+  "source_folder_id": "1GEvzCTVSZ-nDCl6-7G5VpnZd2dH0i4CS",
+  "entries": [
+    {
+      "name": "TUR_PTO_AIRBNB_STGO_2026",
+      "drive_file_id": "1QJiXnA-Z7P44gIpPDhF03UEJKn71nNzd",
+      "format": "GPKG",
+      "layer": "TUR_PTO_AIRBNB_STGO_2026"
+    },
+    {
+      "name": "MOV_GIS_SINIESTROS_VIALES_STGO_ENE_JUL_2026",
+      "drive_file_id": "1VL3CEXAIP053RuhoicOjLw40YgEAL4bi",
+      "format": "GPKG",
+      "layer": "MOV_GIS_SINIESTROS_VIALES_STGO_ENE_JUL_2026"
+    },
+    {
+      "name": "AMB_GIS_MASCOTAS_BAR_2026",
+      "drive_file_id": "14sKyuEq2lZPYhB30D1f5N91VlCiLUDFC",
+      "format": "GPKG",
+      "layer": "AMB_GIS_MASCOTAS_BAR_2026"
+    },
+    {
+      "name": "AMB_GIS_MASCOTAS_MZ_2026",
+      "drive_file_id": "1AFsNmHj0seuvM-SA-wXJCZ8uoY3K_Rp3",
+      "format": "GPKG",
+      "layer": "AMB_GIS_MASCOTAS_MZ_2026"
+    },
+    {
+      "name": "URB_PTO_INICIATIVAS_IMS_PDT_2026",
+      "drive_file_id": "10Aljs0l0QrasI2OrsTuFKvTomiuTL7pP",
+      "format": "GPKG",
+      "layer": "URB_PTO_INICIATIVAS_IMS_PDT_2026"
+    },
+    {
+      "name": "URB_VALOR_SUELO_SII_2025",
+      "drive_file_id": "11m3l8h3mzpjKhgbPCX7xNUMCVIDy1ndA",
+      "format": "GPKG",
+      "layer": "URB_VALOR_SUELO_SII_2025"
+    },
+    {
+      "name": "AMB_GIS_NDWI_2025",
+      "drive_file_id": "1EMCru1SpiecMvcSUsZadjrLiHrPsVVVi",
+      "format": "GPKG",
+      "layer": "AMB_GIS_NDWI_2025"
+    },
+    {
+      "name": "AMB_LIN_RUTAS_ASEO_DOM_2025_VF",
+      "drive_file_id": "1Zdsjyf-ewXe5n_moltBdg3o1vjuP2x7k",
+      "format": "GPKG",
+      "layer": "AMB_LIN_RUTAS_ASEO_DOM_2025_VF"
+    },
+    {
+      "name": "URB_GIS_ALTURAS_HABITACIONALES_2026",
+      "drive_file_id": "1M683bcUxx9BZF8vtjKH138LfCWrwjOJW",
+      "format": "GPKG",
+      "layer": "URB_GIS_ALTURAS_HABITACIONALES_2026"
+    },
+    {
+      "name": "TUR_GIS_SERVICIOS_SERNATUR_2026",
+      "drive_file_id": "1ukuQn2H6qoRVQR8lyS_rUvJfmTKi2tCv",
+      "format": "GPKG",
+      "layer": "TUR_GIS_SERVICIOS_SERNATUR_2026"
+    },
+    {
+      "name": "TUR_GIS_RECURSOS_SERNATUR_2026",
+      "drive_file_id": "1mjawPBlsLwHwexQFP2M-P_EsmKH9echD",
+      "format": "GPKG",
+      "layer": "TUR_GIS_RECURSOS_SERNATUR_2026"
+    },
+    {
+      "name": "TUR_GIS_ATRACTIVOS_SERNATUR_2026",
+      "drive_file_id": "1qhx83fv-edUxuu7qY1j8gAKzmszVDXfY",
+      "format": "GPKG",
+      "layer": "TUR_GIS_ATRACTIVOS_SERNATUR_2026"
+    },
+    {
+      "name": "SOC_PTO_BIBLIOTECAS_VF_2025",
+      "drive_file_id": "1pe0PfFz5aoyj5nWO4gTOM4WOzSBoSSMz",
+      "format": "GPKG",
+      "layer": "SOC_PTO_BIBLIOTECAS_VF_2025"
+    },
+    {
+      "name": "SEG_GIS_RIESGO_SITUACIONAL_2026",
+      "drive_file_id": "1tetvuffy1WMniHWCT3GPQxXJWzMQjrU8",
+      "format": "GPKG",
+      "layer": "SEG_GIS_RIESGO_SITUACIONAL_2026"
+    },
+    {
+      "name": "SOC_GIS_MAESTRO_EDUCACION_STGO",
+      "drive_file_id": "1PvBJp7sIcEcan_9_ONy432-AUGyhVmbS",
+      "format": "GPKG",
+      "layer": "SOC_GIS_MAESTRO_EDUCACION_STGO"
+    },
+    {
+      "name": "AMB_GIS_SINADER_2024",
+      "drive_file_id": "1ixP_rUw0GRdBgVj9znRthLO-34RC2hRj",
+      "format": "GPKG",
+      "layer": "AMB_GIS_SINADER_2024"
+    },
+    {
+      "name": "SAL_GIS_SEREMIS_MINSAL_2026",
+      "drive_file_id": "1oad66Ty1jPJAXoUdA1i5LbMQP_Hj0CoU",
+      "format": "GPKG",
+      "layer": "SAL_GIS_SEREMIS_MINSAL_2026"
+    },
+    {
+      "name": "SAL_GIS_SERVICIO_SALUD_MINSAL_2026",
+      "drive_file_id": "1VglsmlT7SFn69Sx0E6_JowFbZC1IY7YQ",
+      "format": "GPKG",
+      "layer": "SAL_GIS_SERVICIO_SALUD_MINSAL_2026"
+    },
+    {
+      "name": "MOV_GIS_DTPM_INFRAESTRUCTURA_2026",
+      "drive_file_id": "1IKkhgbSAo0fWBT57fmT0924y41yAaEl7",
+      "format": "GPKG",
+      "layer": "MOV_GIS_DTPM_INFRAESTRUCTURA_2026"
+    },
+    {
+      "name": "AMB_GIS_PLAZAS_2026",
+      "drive_file_id": "1gaTS7at7_q6vZcHFbFhdp9N8oE5DLiVH",
+      "format": "SHP",
+      "layer": "AMB_GIS_PLAZAS_2026"
+    },
+    {
+      "name": "URB_LIMITE_COMUNA",
+      "drive_file_id": "1kGk_AHs2Q5g9MwlWngBI_eCFE-RiPG8p",
+      "format": "SHP",
+      "layer": "URB_LIMITE_COMUNA"
+    },
+    {
+      "name": "URB_LIMITE_BARRIOS",
+      "drive_file_id": "1_InmyoOe6WYDSlI2Dp6nh4hV9ELA9i4K",
+      "format": "SHP",
+      "layer": "URB_LIMITE_BARRIOS"
+    },
+    {
+      "name": "URB_LIMITE_MANZANA_CENSAL",
+      "drive_file_id": "1uXHRLVMSo5vaJdvWveOrQVyLdT11MSzO",
+      "format": "SHP",
+      "layer": "URB_LIMITE_MANZANA_CENSAL"
+    },
+    {
+      "name": "URB_STGO_MZ_BARRIO_TERRITORIO",
+      "drive_file_id": "1E-aguQL97E_un1m5GZHXgBavNyJRxZow",
+      "format": "SHP",
+      "layer": "URB_STGO_MZ_BARRIO_TERRITORIO"
+    },
+    {
+      "name": "URB_LIMITE_TERRITORIOS_PLADECO",
+      "drive_file_id": "1Rh9V-NjMgO3mhhUW1mQDbiWne_Hrv9rN",
+      "format": "SHP",
+      "layer": "URB_LIMITE_TERRITORIOS_PLADECO"
+    },
+    {
+      "name": "ECO_PTO_DNE_INE_2017",
+      "drive_file_id": "1hpsVwSq1N0dudc8mrmkOFcPRtEpYnqfj",
+      "format": "GPKG",
+      "layer": "ECO_PTO_DNE_INE_2017"
+    }
+  ]
+}
