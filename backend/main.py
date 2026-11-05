@@ -1,11 +1,9 @@
 """Servicio privado de descargas: Drive (solo lectura) -> ZIP/Excel temporal."""
-import io
 import json
 import os
 import re
 import sqlite3
 import tempfile
-import unicodedata
 import zipfile
 from pathlib import Path
 
@@ -28,6 +26,7 @@ CLIENT_ID = os.environ.get("GOOGLE_CLIENT_ID", "")
 ALLOWED_EMAILS = {x.strip().lower() for x in os.environ.get("ALLOWED_EMAILS", "").split(",") if x.strip()}
 ALLOWED_DOMAIN = os.environ.get("ALLOWED_DOMAIN", "").strip().lower()
 MAX_BYTES = int(os.environ.get("MAX_FILE_BYTES", str(300 * 1024 * 1024)))
+MAX_TOTAL_BYTES = int(os.environ.get("MAX_TOTAL_BYTES", str(600 * 1024 * 1024)))
 ORIGIN = os.environ.get("FRONTEND_ORIGIN", "https://phdgeografo.github.io").rstrip("/")
 app = FastAPI(title="Biblioteca Digital — descarga protegida", docs_url=None, redoc_url=None)
 app.add_middleware(CORSMiddleware, allow_origins=[ORIGIN], allow_credentials=False, allow_methods=["GET"], allow_headers=["Authorization", "Content-Type"])
@@ -83,7 +82,7 @@ def shapefile_parts(api, shp):
     folder = (shp.get("parents") or [None])[0]
     if not folder:
         raise HTTPException(422, "Shapefile sin carpeta de origen")
-    quoted = folder.replace("'", "\\'")
+    quoted = folder.replace("\\", "\\\\").replace("'", "\\'")
     fields = "nextPageToken,files(id,name,mimeType,size,parents,trashed)"
     found = []
     token = None
@@ -182,6 +181,9 @@ def download(coverage_name: str, format: str = Query("zip", pattern="^(zip|xlsx)
             if not meta["name"].lower().endswith(".gpkg"):
                 raise HTTPException(422, "El archivo de Drive no corresponde a un GPKG")
             parts = [meta]
+        total_size = sum(int(part.get("size") or 0) for part in parts)
+        if total_size > MAX_TOTAL_BYTES:
+            raise HTTPException(413, "Cobertura supera el tamaño máximo total permitido")
         local = []
         for part in parts:
             path = work / clean_name(part["name"])
