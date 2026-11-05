@@ -135,11 +135,46 @@ $('detail').innerHTML='<h3>'+esc(r.n)+'</h3><p><b>Tema:</b> '+esc(r.tema||'Sin c
 $('mapinfo').textContent='Buscando geometría web de '+r.n+'…';updateDownload();
 const url=viewURL(r);if(!url){$('mapinfo').textContent='La cobertura seleccionada no tiene una geometría web enlazada. Su ficha de inventario no contiene los datos espaciales. Para visualizarla, se requiere un GeoJSON o ZIP SHP accesible, o cargar el archivo desde tu equipo.';$('attrStatus').textContent='Sin tabla de atributos: el archivo original no está disponible para lectura web.';return}
 try{const resp=await fetch(url);if(!resp.ok)throw Error('HTTP '+resp.status);const g=await resp.json();if(token!==request)return;if(!g.type)throw Error('Geometría no válida');preview=g;draw(g,r.n);updateDownload()}catch(e){if(token===request)$('mapinfo').textContent='No se pudo cargar la geometría web: '+e.message}}
+const demoBarriosUrl='https://phdgeografo.github.io/HERRAMIENTAS/geocodificador/datos/barrios.geojson';
+let demoCache=null,demoSeq=0;
+async function loadDemoCoverage(kind,button){
+ const seq=++demoSeq;const label=kind==='points'?'Puntos de referencia barriales (derivados)':'Polígonos de barrios Santiago (fuente pública)';
+ document.querySelectorAll('.item.active,.gpkg-child.active,.demo-layer.active').forEach(x=>x.classList.remove('active'));
+ if(button)button.classList.add('active');
+ request++;selected=null;preview=null;
+ window.dispatchEvent(new CustomEvent('biblioteca:coverage-selected',{detail:{coverage:{n:label}}}));
+ clearAttributes('Cargando capa de prueba…');
+ if(layer){map.removeLayer(layer);layer=null}
+ $('mapinfo').textContent='Leyendo '+label+'…';
+ try{
+   if(!demoCache){const response=await fetch(demoBarriosUrl,{cache:'no-store'});if(!response.ok)throw Error('HTTP '+response.status);demoCache=await response.json()}
+   if(seq!==demoSeq)return;
+   const source=demoCache;
+   let data=source;
+   if(kind==='points'){
+     const points=[];
+     for(const f of source.features||[]){
+       if(!f.geometry)continue;
+       const bounds=L.geoJSON(f).getBounds();
+       if(!bounds.isValid())continue;
+       const center=bounds.getCenter();
+       points.push({type:'Feature',geometry:{type:'Point',coordinates:[center.lng,center.lat]},properties:{BARRIO:f.properties?.BARRIO||f.properties?.barrio||'Sin nombre',TIPO:'Punto de referencia derivado',FUENTE:'Barrios Santiago · GeoJSON público',METODO:'Centro de la envolvente de cada polígono'}});
+     }
+     data={type:'FeatureCollection',features:points};
+   }
+   draw(data,label);preview=data;
+   $('detail').innerHTML='<h3>'+esc(label)+'</h3><p><b>Geometría:</b> '+(kind==='points'?'Puntos':'Polígonos')+'</p><p><b>Entidades:</b> '+(data.features?.length||0)+'</p><p><b>Origen:</b> GeoJSON público de barrios de Santiago.</p><p>'+(kind==='points'?'Puntos calculados para probar el visor. Son centros de envolvente, no puntos catastrales ni coordenadas de equipamientos.':'Polígonos de barrios georreferenciados de la fuente web existente.')+'</p>';
+   $('mapinfo').textContent=label+' · '+(data.features?.length||0)+' entidades cargadas. Usa «Visualizar tabla» o exporta los datos.';
+ }catch(e){$('mapinfo').textContent='No se pudo cargar la prueba: '+e.message}
+}
 function groupKey(r){return String(r.gpkgContenedor||r.contenedor_gpkg||r.gpkgArchivo||r.gpkg_parent||'').trim()}
 function render(){const term=norm($('search').value),tema=$('tema').value,ge=$('geo').value;
 const out=db.filter(r=>(!tema||r.tema===tema)&&(!ge||geo(r.geom)===ge)&&norm([r.n,r.tema,r.dim,r.carp,r.ano,r.desc,r.geom,groupKey(r)].join(' ')).includes(term));
 $('summary').textContent=out.length+' de '+db.length+' coberturas. GeoPackages con subcapas identificadas se presentan en listas desplegables.';
 const box=$('results');box.replaceChildren();
+const demo=document.createElement('div');demo.style.cssText='padding:10px;background:#eaf5ef;border-bottom:2px solid #c6ddcf';
+demo.innerHTML='<strong style="display:block;margin-bottom:7px;font-size:12px">Capas para probar el visor</strong><div style="display:flex;flex-direction:column;gap:6px"><button type="button" class="demo-layer" data-kind="points" style="text-align:left;border:1px solid #bbd2c4;border-radius:6px;padding:9px;background:white;cursor:pointer">● Puntos de referencia de barrios (27 · derivados)</button><button type="button" class="demo-layer" data-kind="polygons" style="text-align:left;border:1px solid #bbd2c4;border-radius:6px;padding:9px;background:white;cursor:pointer">▰ Polígonos de barrios Santiago (27 · fuente pública)</button></div>';
+demo.querySelectorAll('button').forEach(b=>b.onclick=()=>loadDemoCoverage(b.dataset.kind,b));box.appendChild(demo);
 const groups=new Map(),ungrouped=[];
 for(const r of out){const k=groupKey(r);if(k){if(!groups.has(k))groups.set(k,[]);groups.get(k).push(r)}else ungrouped.push(r)}
 let count=0;
