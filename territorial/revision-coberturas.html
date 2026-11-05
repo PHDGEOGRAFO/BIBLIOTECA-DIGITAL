@@ -19,56 +19,61 @@ button,.filebtn{border:0;border-radius:6px;background:var(--green);color:white;p
 button.secondary,.filebtn{background:#e1ece7;color:#204738}.filebtn{display:inline-block}
 #upload{display:none}
 .table-wrap{overflow:auto;background:white;border:1px solid var(--border);border-radius:10px;max-height:68vh}
-table{border-collapse:collapse;width:100%;min-width:1180px;font-size:12px}
+table{border-collapse:collapse;width:100%;min-width:1510px;font-size:12px}
 th{position:sticky;top:0;background:#e8f0ec;z-index:1;text-align:left;padding:10px 8px;border-bottom:2px solid #c7d9d0;white-space:nowrap}
 td{padding:8px;border-bottom:1px solid #e9efea;vertical-align:top}
 tbody tr:hover{background:#f4faf6}
 .name{font-weight:700;max-width:290px;overflow-wrap:anywhere}
 .muted{color:#61756a}.tag{background:#edf3ef;display:inline-block;padding:3px 6px;border-radius:4px;white-space:nowrap}
-.tag.warn{background:#fff0d8;color:#815800}.tag.dup{background:#fce6dd;color:#934b2a}
+.tag.warn{background:#fff0d8;color:#815800}.tag.dup{background:#fce6dd;color:#934b2a}.normalized{font-weight:700;color:#155746}.seq{font-weight:700;font-variant-numeric:tabular-nums}.orig{color:#6e7974;font-size:11px}
 td select{min-width:145px;font-size:11px;padding:6px}td input{min-width:180px;font-size:11px;padding:6px}
 small{color:var(--muted)}.footer{font-size:12px;margin:10px 0;color:#5c7064}
 @media(max-width:800px){.controls{grid-template-columns:1fr 1fr}.metrics{grid-template-columns:repeat(2,minmax(0,1fr))}}
 </style></head><body>
 <header><a href="coberturas.html">← Volver al visor territorial</a><h1>Revisión y depuración del catálogo de coberturas</h1><p>Secretaría Comunal de Planificación · Subdirección de Planificación y Sustentabilidad · Oficina de Planificación Estratégica</p></header>
 <main>
-<div class="note"><strong>Revisión sin eliminación automática.</strong> Este listado presenta las coberturas vigentes tras excluir las 334 propuestas de baja del inventario original. Marca <em>Mantener</em>, <em>Revisar</em>, <em>Consolidar</em> o <em>Proponer baja</em> y escribe un motivo. Las decisiones se guardan solo en este navegador; exporta el CSV para respaldarlas. Ninguna acción borra archivos de Google Drive ni modifica el catálogo original. Los nombres repetidos no prueban que sus geometrías sean iguales: revisa año, carpeta y contenido antes de decidir.</div>
+<div class="note"><strong>Revisión sin eliminación automática.</strong> Este listado presenta las coberturas vigentes tras excluir las 334 propuestas de baja del inventario original. Marca <em>Mantener</em>, <em>Revisar</em>, <em>Consolidar</em> o <em>Proponer baja</em> y escribe un motivo. Las decisiones se guardan solo en este navegador; exporta el CSV para respaldarlas. Ninguna acción borra archivos de Google Drive ni modifica el catálogo original. La comparación ignora prefijos de dimensión (ECO, AMB, URB, SOC, INS, DEM, TUR e IAT), pero no altera los nombres originales de archivos ni las decisiones. Las coincidencias de nombre no prueban geometrías iguales: revisa año, carpeta y contenido.</div>
 <div class="metrics"><div class="metric"><strong id="mt">—</strong><span>Coberturas inventariadas</span></div><div class="metric"><strong id="ml">—</strong><span>Con enlace individual a Drive</span></div><div class="metric"><strong id="md">—</strong><span>Filas con nombre repetido</span></div><div class="metric"><strong id="mb">0</strong><span>Propuestas de baja registradas</span></div></div>
 <div class="controls"><input type="search" id="search" placeholder="Buscar nombre, tema, carpeta, año o dimensión" aria-label="Buscar coberturas">
 <select id="dimension"><option value="">Todas las dimensiones</option></select>
 <select id="filter"><option value="">Todos los estados</option><option value="duplicate">Nombres repetidos</option><option value="nolink">Sin enlace individual de Drive</option><option value="linked">Con enlace Drive</option><option value="pending">Sin decisión registrada</option><option value="baja">Propuestas de baja</option><option value="consolidar">Para consolidar</option></select>
 <select id="format"><option value="">Todos los formatos</option></select></div>
 <div class="toolbar"><button id="export">Descargar revisión CSV</button><button id="exportFiltered" class="secondary">Exportar filas filtradas</button><label class="filebtn" for="upload">Importar revisión CSV</label><input id="upload" type="file" accept=".csv,text/csv"><button class="secondary" id="reset">Borrar decisiones locales</button></div>
-<div class="table-wrap"><table><thead><tr><th>N.º</th><th>Cobertura</th><th>Dimensión / Tema</th><th>Año</th><th>Formato</th><th>Carpeta fuente</th><th>Registros</th><th>Enlace Drive</th><th>Alerta</th><th>Decisión</th><th>Motivo / observación</th></tr></thead><tbody id="body"><tr><td colspan="11">Cargando catálogo…</td></tr></tbody></table></div>
+<div class="table-wrap"><table><thead><tr><th>N.º alfabético</th><th>ID original</th><th>Nombre normalizado (A–Z)</th><th>Cobertura original</th><th>Repeticiones</th><th>Orden en grupo</th><th>Dimensión / Tema</th><th>Año</th><th>Formato</th><th>Carpeta fuente</th><th>Registros</th><th>Enlace Drive</th><th>Alerta</th><th>Decisión</th><th>Motivo / observación</th></tr></thead><tbody id="body"><tr><td colspan="16">Cargando catálogo…</td></tr></tbody></table></div>
 <p class="footer" id="message" role="status">El archivo CSV se puede abrir en Excel. Para revisar las coberturas vigentes, utiliza los filtros por nombre, dimensión, formato o alerta.</p>
 </main>
 <script>
 const $=id=>document.getElementById(id),norm=s=>String(s??'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toUpperCase().replace(/[^A-Z0-9]/g,''),esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const STORAGE_KEY='stgo_revision_coberturas_20261105';let rows=[],decisions={},counts=new Map(),filtered=[];
+const PREFIXES=new Set(['ECO','AMB','URB','SOC','INS','DEM','TUR','IAT']);
+function normalizedName(name){let pieces=String(name??'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toUpperCase().replace(/[^A-Z0-9]+/g,'_').replace(/^_+|_+$/g,'').split('_');while(pieces.length>1&&PREFIXES.has(pieces[0]))pieces.shift();return pieces.join('_')}
+function groupKeyName(r){return norm(normalizedName(r.n))}
+function ordered(list){return [...list].sort((a,b)=>normalizedName(a.n).localeCompare(normalizedName(b.n),'es',{numeric:true,sensitivity:'base'})||String(a.n).localeCompare(String(b.n),'es',{numeric:true})||(a.id_revision_original||0)-(b.id_revision_original||0))}
 try{decisions=JSON.parse(localStorage.getItem(STORAGE_KEY)||'{}')||{}}catch(e){decisions={}}
 function store(){try{localStorage.setItem(STORAGE_KEY,JSON.stringify(decisions))}catch(e){$('message').textContent='El navegador no pudo guardar la revisión. Exporta ahora el CSV.'}}
 function idOf(r,i){return String(r.id_revision_original||i+1)+'|'+r.n+'|'+r.carp+'|'+r.ano}
 function linked(r){return /https:\/\/drive\.google\.com\/file\/d\/[^/]+/i.test(String(r.url||''))}
-function duplicate(r){return (counts.get(norm(r.n))||0)>1}
-function current(){const q=norm($('search').value),dim=$('dimension').value,f=$('filter').value,fmt=$('format').value;return rows.filter((r,i)=>{
+function duplicate(r){return (counts.get(groupKeyName(r))||0)>1}
+function current(){const q=norm($('search').value),dim=$('dimension').value,f=$('filter').value,fmt=$('format').value;return ordered(rows.filter((r,i)=>{
  const d=decisions[idOf(r,i)]||{};
- return (!q||norm([r.n,r.tema,r.dim,r.carp,r.ano,r.formato].join(' ')).includes(q))&&(!dim||r.dim===dim)&&(!fmt||r.formato===fmt)&&(!f|| (f==='duplicate'&&duplicate(r))||(f==='nolink'&&!linked(r))||(f==='linked'&&linked(r))||(f==='pending'&&!d.decision)||(f===d.decision));
-})}
+ return (!q||norm([r.n,normalizedName(r.n),r.tema,r.dim,r.carp,r.ano,r.formato].join(' ')).includes(q))&&(!dim||r.dim===dim)&&(!fmt||r.formato===fmt)&&(!f|| (f==='duplicate'&&duplicate(r))||(f==='nolink'&&!linked(r))||(f==='linked'&&linked(r))||(f==='pending'&&!d.decision)||(f===d.decision));
+}))}
 function render(){
  filtered=current();
- $('mt').textContent=rows.length.toLocaleString('es-CL');$('ml').textContent=rows.filter(linked).length;$('md').textContent=rows.filter(duplicate).length;$('mb').textContent=Object.values(decisions).filter(x=>x.decision==='baja').length;
+ $('mt').textContent=rows.length.toLocaleString('es-CL');$('ml').textContent=rows.filter(linked).length;$('md').textContent=rows.filter(duplicate).length;$('mb').textContent=rows.filter((r,i)=>decisions[idOf(r,i)]?.decision==='baja').length;
  const body=$('body');body.replaceChildren();const frag=document.createDocumentFragment();
- filtered.forEach(r=>{const i=rows.indexOf(r),id=idOf(r,i),d=decisions[id]||{},tr=document.createElement('tr');
- const values=[r.id_revision_original||i+1,r.n,r.dim||r.tema||'',r.ano||'',r.formato||'',r.carp||'',r.reg??''];
- values.forEach((v,j)=>{let c=document.createElement('td');c.textContent=v;if(j===1)c.className='name';tr.append(c)});
+ const seenInGroup=new Map();
+ filtered.forEach((r,rank)=>{const i=rows.indexOf(r),id=idOf(r,i),d=decisions[id]||{},tr=document.createElement('tr'),group=groupKeyName(r),ordinal=(seenInGroup.get(group)||0)+1;seenInGroup.set(group,ordinal);
+ const values=[rank+1,r.id_revision_original||i+1,normalizedName(r.n),r.n,counts.get(group)||1,ordinal+' de '+(counts.get(group)||1),r.dim||r.tema||'',r.ano||'',r.formato||'',r.carp||'',r.reg??''];
+ values.forEach((v,j)=>{let c=document.createElement('td');c.textContent=v;if(j===0)c.className='seq';if(j===1)c.className='orig';if(j===2)c.className='normalized';if(j===3)c.className='name';tr.append(c)});
  const url=document.createElement('td');if(linked(r)){const a=document.createElement('a');a.href=r.url;a.target='_blank';a.rel='noopener noreferrer';a.textContent='Ver origen';url.append(a)}else{url.textContent='Sin enlace individual';url.className='muted'}tr.append(url);
  const flag=document.createElement('td');flag.innerHTML=(duplicate(r)?'<span class="tag dup">Nombre repetido</span> ':'')+(!linked(r)?'<span class="tag warn">Sin vínculo</span>':'<span class="tag">Origen identificado</span>');tr.append(flag);
  const td=document.createElement('td'),sel=document.createElement('select');[['','Sin decisión'],['mantener','Mantener'],['revisar','Revisar'],['consolidar','Consolidar'],['baja','Proponer baja']].forEach(([v,label])=>{const o=document.createElement('option');o.value=v;o.textContent=label;sel.append(o)});sel.value=d.decision||'';sel.onchange=()=>{const x=decisions[id]||{};x.decision=sel.value;decisions[id]=x;store();$('mb').textContent=Object.values(decisions).filter(x=>x.decision==='baja').length};td.append(sel);tr.append(td);
  const note=document.createElement('td'),input=document.createElement('input');input.value=d.motivo||'';input.placeholder='Razón, comparación o archivo consolidado';input.onchange=()=>{const x=decisions[id]||{};x.motivo=input.value;decisions[id]=x;store()};note.append(input);tr.append(note);frag.append(tr)
- });body.append(frag);$('message').textContent='Mostrando '+filtered.length+' de '+rows.length+' entradas. Las decisiones no afectan archivos de Drive.'}
+ });body.append(frag);$('message').textContent='Mostrando '+filtered.length+' de '+rows.length+' entradas en orden alfabético normalizado. Repeticiones calculadas sobre todo el catálogo vigente. Las decisiones no afectan archivos de Drive.'}
 function csvEscape(s){return '"'+String(s??'').replace(/"/g,'""')+'"'}
-const cols=['ID_FILA','COBERTURA','DIMENSION','TEMA','ANIO','FORMATO','CARPETA','REGISTROS','ENLACE_DRIVE','DUPLICADO_NOMINAL','DECISION','MOTIVO'];
-function exportCSV(partial){const subset=partial?filtered:rows;const lines=[cols.join(';')];for(const r of subset){const i=rows.indexOf(r),d=decisions[idOf(r,i)]||{},values=[i+1,r.n,r.dim,r.tema,r.ano,r.formato,r.carp,r.reg,r.url,duplicate(r)?'SI':'NO',d.decision||'',d.motivo||''];lines.push(values.map(csvEscape).join(';'))}
+const cols=['ID_FILA','COBERTURA','DIMENSION','TEMA','ANIO','FORMATO','CARPETA','REGISTROS','ENLACE_DRIVE','DUPLICADO_NOMINAL','DECISION','MOTIVO','NUMERO_ALFABETICO','NOMBRE_NORMALIZADO','REPETICIONES_NORMALIZADAS'];
+function exportCSV(partial){const subset=partial?filtered:ordered(rows);const lines=[cols.join(';')];for(const [pos,r] of subset.entries()){const i=rows.indexOf(r),d=decisions[idOf(r,i)]||{},values=[r.id_revision_original||i+1,r.n,r.dim,r.tema,r.ano,r.formato,r.carp,r.reg,r.url,duplicate(r)?'SI':'NO',d.decision||'',d.motivo||'',pos+1,normalizedName(r.n),counts.get(groupKeyName(r))||1];lines.push(values.map(csvEscape).join(';'))}
  const blob=new Blob(['\ufeff'+lines.join('\r\n')],{type:'text/csv;charset=utf-8'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=partial?'REVISION_COBERTURAS_FILTRADAS.csv':'REVISION_COBERTURAS_VIGENTES.csv';document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),30000)}
 // Lector CSV con comillas escapadas; importación únicamente de decisiones, no reemplaza catálogo.
 function parseCSV(raw){const matrix=[];let row=[],v='',quoted=false;for(let i=0;i<raw.length;i++){let c=raw[i];if(c==='"'){if(quoted&&raw[i+1]==='"'){v+='"';i++}else quoted=!quoted}else if(c===';'&&!quoted){row.push(v);v=''}else if((c==='\r'||c==='\n')&&!quoted){if(c==='\r'&&raw[i+1]==='\n')i++;row.push(v);matrix.push(row);row=[];v=''}else v+=c}if(row.length||v){row.push(v);matrix.push(row)}return matrix}
@@ -76,5 +81,5 @@ $('upload').onchange=async e=>{const file=e.target.files?.[0];if(!file)return;tr
 $('export').onclick=()=>exportCSV(false);$('exportFiltered').onclick=()=>exportCSV(true);
 $('reset').onclick=()=>{if(confirm('¿Borrar solamente las decisiones guardadas en este navegador? El catálogo y Drive no se modifican.')){decisions={};store();render()}};
 ['search','dimension','filter','format'].forEach(id=>$(id).addEventListener(id==='search'?'input':'change',render));
-(async()=>{try{const resp=await fetch('catalogo-drive.json',{cache:'no-store'});if(!resp.ok)throw Error('No se pudo leer el catálogo');rows=(await resp.json()).rows||[];counts=new Map();rows.forEach(r=>counts.set(norm(r.n),(counts.get(norm(r.n))||0)+1));for(const key of ['dimension','format']){let field=key==='dimension'?'dim':'formato';[...new Set(rows.map(r=>r[field]).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'es')).forEach(v=>{let opt=document.createElement('option');opt.value=v;opt.textContent=v;$(key).append(opt)})}render()}catch(e){$('body').innerHTML='<tr><td colspan="11">'+esc(e.message)+'</td></tr>'}})();
+(async()=>{try{const resp=await fetch('catalogo-drive.json',{cache:'no-store'});if(!resp.ok)throw Error('No se pudo leer el catálogo');rows=(await resp.json()).rows||[];counts=new Map();rows.forEach(r=>counts.set(groupKeyName(r),(counts.get(groupKeyName(r))||0)+1));for(const key of ['dimension','format']){let field=key==='dimension'?'dim':'formato';[...new Set(rows.map(r=>r[field]).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'es')).forEach(v=>{let opt=document.createElement('option');opt.value=v;opt.textContent=v;$(key).append(opt)})}render()}catch(e){$('body').innerHTML='<tr><td colspan="11">'+esc(e.message)+'</td></tr>'}})();
 </script></body></html>
