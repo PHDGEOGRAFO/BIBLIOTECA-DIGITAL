@@ -167,4 +167,4 @@ $('clear').onclick=()=>{if(layer)map.removeLayer(layer);layer=null;preview=null;
 (async()=>{try{const r=await fetch('catalogo-drive.json?v=20261104',{cache:'no-store'});if(!r.ok)throw Error('HTTP '+r.status);const j=await r.json();fullCatalog=j.rows||[];db=revisedCatalog();for(const v of [...new Set(db.map(r=>r.tema).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'es'))){const opt=document.createElement('option');opt.value=v;opt.textContent=v;$('tema').appendChild(opt)}render()}catch(e){$('summary').textContent='No se pudo cargar el catálogo: '+e.message}})();
 ['search','tema','geo'].forEach(id=>$(id).addEventListener(id==='search'?'input':'change',render));
 initAuthenticatedDownloads();
-</script><script src="conversor-prueba.js?v=20261105"></script></body></html>
+</script><script src="exportadores-gis.js?v=20261105b"></script><script src="conversor-prueba.js?v=20261105b"></script></body></html>
