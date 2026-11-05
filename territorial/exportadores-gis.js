@@ -84,7 +84,7 @@ window.BibliotecaGISExport=(()=>{
   const bounds=[Infinity,Infinity,-Infinity,-Infinity];
   for(const f of rows)if(f.geometry)bound(f.geometry,bounds);
   try{
-   db.run('PRAGMA application_id=1196437808'); // 0x47504B47 GPKG
+   db.run('PRAGMA application_id=1196444487'); // 0x47504B47 GPKG
    db.run('PRAGMA user_version=10300');
    db.run('CREATE TABLE gpkg_spatial_ref_sys (srs_name TEXT NOT NULL,srs_id INTEGER NOT NULL PRIMARY KEY,organization TEXT NOT NULL,organization_coordsys_id INTEGER NOT NULL,definition TEXT NOT NULL,description TEXT)');
    db.run('CREATE TABLE gpkg_contents (table_name TEXT NOT NULL PRIMARY KEY,data_type TEXT NOT NULL,identifier TEXT UNIQUE,description TEXT DEFAULT \'\',last_change DATETIME NOT NULL DEFAULT (strftime(\'%Y-%m-%dT%H:%M:%fZ\',\'now\')),min_x DOUBLE,min_y DOUBLE,max_x DOUBLE,max_y DOUBLE,srs_id INTEGER,CONSTRAINT fk_gc_r_srs_id FOREIGN KEY (srs_id) REFERENCES gpkg_spatial_ref_sys(srs_id))');
