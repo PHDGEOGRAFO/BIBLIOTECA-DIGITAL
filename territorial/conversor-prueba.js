@@ -12,6 +12,7 @@ async function fromZip(bytes){await load('https://cdn.jsdelivr.net/npm/shpjs@6.2
 async function fromGpkg(bytes){
  await load('https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.10.3/sql-wasm.js',()=>typeof window.initSqlJs==='function');
  await load('https://cdnjs.cloudflare.com/ajax/libs/proj4js/2.12.1/proj4.js',()=>typeof window.proj4==='function');
+ window.proj4.defs('EPSG:32719','+proj=utm +zone=19 +south +datum=WGS84 +units=m +no_defs');
  const SQL=await window.initSqlJs({locateFile:f=>'https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.10.3/'+f});
  const db=new SQL.Database(new Uint8Array(bytes));let out=[];
  try{
@@ -74,7 +75,7 @@ async function driveFile(id){
  if(/\.shp$/i.test(name)){
  if(!meta.parents?.[0])throw Error('No se puede localizar la carpeta del Shapefile');
  const parent=meta.parents[0],prefix=name.slice(0,-4);
- const query="'"+parent.replace(/'/g,"\\'")+"' in parents and trashed = false";
+ const query="'"+parent+"' in parents and trashed = false";
  const list=await fetch('https://www.googleapis.com/drive/v3/files?q='+encodeURIComponent(query)+'&fields=files(id,name),nextPageToken&page_size=1000',{headers:{Authorization:'Bearer '+driveToken}});
  if(!list.ok)throw Error('Sin permiso para listar componentes SHP');
  const info=await list.json();const components=(info.files||[]).filter(x=>x.name.toLowerCase().startsWith(prefix.toLowerCase()+'.')&&/\.(shp|shx|dbf|prj|cpg)$/i.test(x.name));
@@ -103,7 +104,7 @@ function addUi(){
  $('convertLocal').onchange=e=>handleFile(e.target.files[0]);
  $('convertLayer').onchange=e=>setLayer(Number(e.target.value));
  $('convertGeojson').onclick=()=>{if(current)exportBlob(new Blob([JSON.stringify(current)],{type:'application/geo+json'}),clean(sourceName)+'.geojson')};
- $('convertCsv').onclick=()=>{if(!current)return;const data=current.features||[];const keys=[...new Set(data.flatMap(f=>Object.keys(f.properties||{})))];const cell=v=>'"'+String(v??'').replace(/"/g,'""')+'"';const rows=[keys.map(cell).join(';'),...data.map(f=>keys.map(k=>cell(f.properties?.[k])).join(';'))];exportBlob(new Blob(['\ufeff'+rows.join('\r\n')],{type:'text/csv;charset=utf-8'}),clean(sourceName)+'.csv')};
+ $('convertCsv').onclick=()=>{if(!current)return;const data=current.features||[];const keys=[...new Set(data.flatMap(f=>Object.keys(f.properties||{})))];if(!keys.length){status('La cobertura no contiene columnas de atributos para exportar a CSV.');return;}const cell=v=>'"'+String(v??'').replace(/"/g,'""')+'"';const rows=[keys.map(cell).join(';'),...data.map(f=>keys.map(k=>cell(f.properties?.[k])).join(';'))];exportBlob(new Blob(['\ufeff'+rows.join('\r\n')],{type:'text/csv;charset=utf-8'}),clean(sourceName)+'.csv')};
  $('openOriginal').onclick=()=>{if(sourceFile)exportBlob(sourceFile,sourceFile.name)};
  $('connectDrive').onclick=()=>tokenClient?.requestAccessToken({prompt:'consent'});
  $('driveLoad').onclick=async()=>{if(!selected?.driveFileId)return status('La cobertura seleccionada no tiene archivo individual identificado en Drive.');try{status('Descargando cobertura autorizada…');await driveFile(selected.driveFileId)}catch(e){status('No se pudo cargar desde Drive: '+e.message)}};
