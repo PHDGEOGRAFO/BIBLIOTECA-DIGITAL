@@ -33,3 +33,21 @@ El servidor lee archivos de la carpeta principal de Drive a través de la cuenta
 
 ## Estado
 Código y conexión de interfaz preparados. No se han desplegado credenciales, Cloud Run ni API pública: las descargas **no están operativas** hasta completar el despliegue y pruebas autenticadas de extremo a extremo.
+
+## Pruebas del código
+
+Desde la carpeta raíz del repositorio, con las dependencias instaladas:
+
+```bash
+python -m unittest discover -s backend/tests -v
+```
+
+Las pruebas no requieren conectarse a Drive: verifican exportación Excel desde SQLite/GeoPackage, integridad del original, selección de componentes SHP y errores ante componentes ausentes. Todavía no sustituyen la prueba integrada del servicio Cloud Run con las cuentas institucionales.
+
+### Muestra revisada en Drive (5 noviembre 2026)
+
+- `AMB_GIS_PLAZAS_2026`: existen `.shp`, `.shx`, `.dbf`, `.prj`, `.cpg` en la carpeta de origen.
+- `URB_LIMITE_COMUNA`: existen `.shp`, `.shx`, `.dbf`, `.prj`, `.cpg` en la carpeta de origen.
+- `TUR_PTO_AIRBNB_STGO_2026` y `MOV_GIS_SINIESTROS_VIALES_STGO_ENE_JUL_2026`: metadatos de archivo GPKG verificados.
+
+Estas comprobaciones se realizaron con el acceso del propietario de Drive. No validan todavía acceso desde la cuenta de servicio ni descargas de usuario final.
