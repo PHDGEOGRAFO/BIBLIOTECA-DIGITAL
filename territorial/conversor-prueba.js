@@ -100,7 +100,7 @@ async function configureOAuth(id){
   $('connectDrive').textContent='Reconectar Google Drive';
   $('driveLoad').disabled=false;
   status('Conexión de solo lectura a Google Drive autorizada; selecciona una cobertura para visualizarla.');
-  if(window.selected?.driveFileId){try{const seq=++loadSequence;await driveFile(window.selected.driveFileId,window.selected.n,seq)}catch(e){status('Drive autorizado, pero la cobertura seleccionada no pudo cargarse: '+e.message)}}
+  if(preferredCoverage?.driveFileId){try{const seq=++loadSequence;await driveFile(preferredCoverage.driveFileId,preferredCoverage.n,seq)}catch(e){status('Drive autorizado, pero la cobertura seleccionada no pudo cargarse: '+e.message)}}
  }});
  $('connectDrive').disabled=false;$('connectDrive').style.display='inline-block';
  $('driveLoad').style.display='inline-block';$('oauthSetup').style.display='none';
