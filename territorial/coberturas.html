@@ -7,7 +7,7 @@ let db=[],selected=null,layer=null,barrioLayer=null,preview=null,request=0,downl
 // La revisión conserva índices originales del inventario y excluye solo las bajas.
 const REVISION_KEY='stgo_revision_coberturas_20261105';let fullCatalog=[];
 function revisedCatalog(){let d={};try{d=JSON.parse(localStorage.getItem(REVISION_KEY)||'{}')||{}}catch(_){}return fullCatalog.filter(r=>{const id=String(r.id_revision_original||'')+'|'+r.n+'|'+r.carp+'|'+r.ano;return d[id]?.decision!=='baja'})}
-function syncRevision(){if(!fullCatalog.length)return;db=revisedCatalog();if(selected&&!db.includes(selected)){selected=null;preview=null;clearAttributes('Esta cobertura fue excluida por propuesta de baja.');$('detail').innerHTML='<h3>Selecciona una cobertura</h3><p>La cobertura anterior fue retirada del listado por la revisión.</p>';if(layer){map.removeLayer(layer);layer=null}updateDownload()}render()}
+function syncRevision(){if(!fullCatalog.length)return;db=revisedCatalog();enabledNames=new Set([...enabledNames].filter(name=>db.some(r=>r.n===name)));if(selected&&!db.includes(selected)){selected=null;preview=null;clearAttributes('Esta cobertura fue excluida por propuesta de baja.');$('detail').innerHTML='<h3>Selecciona una cobertura</h3><p>La cobertura anterior fue retirada del listado por la revisión.</p>';if(layer){map.removeLayer(layer);layer=null}updateDownload()}render()}
 window.addEventListener('storage',e=>{if(e.key===REVISION_KEY)syncRevision()});window.addEventListener('focus',syncRevision);
 function geo(v){const x=norm(v).replace(/[^a-z]/g,'');if(!x)return 'Sin especificar';if(/multipolygon|multipoligono|multipol/.test(x))return 'Multipolígono';if(/multilinestring|multilinea|multiline/.test(x))return 'Multilínea';if(/multipoint|multipunto|point|punto/.test(x))return 'Punto';if(/linestring|linea|line|curve/.test(x))return 'Línea';if(/polygon|poligono|poligon|surface/.test(x))return 'Polígono';return 'Sin especificar'}
 const map=L.map('map',{preferCanvas:true}).setView([-33.4489,-70.6693],12);
@@ -99,7 +99,7 @@ async function initAuthenticatedDownloads(){
   downloadToken=credential.credential;
   try{const r=await fetch(cfg.apiBase.replace(/\/$/,'')+'/api/capabilities',{headers:{Authorization:'Bearer '+downloadToken},cache:'no-store'});
   const x=await r.json();if(!r.ok)throw Error(typeof x.detail==='string'?x.detail:'Acceso no autorizado');
-  enabledNames=new Set(x.coverage_names||[]);capabilitiesLoaded=true;
+  enabledNames=new Set((x.coverage_names||[]).filter(name=>db.some(r=>r.n===name)));capabilitiesLoaded=true;
   $('google-signin').style.display='none';$('logout-downloads').style.display='inline-block';updateDownload()
   }catch(e){downloadToken=null;enabledNames.clear();capabilitiesLoaded=false;$('dlstatus').textContent='Acceso a descargas: '+e.message;updateDownload()}
  }});
@@ -110,7 +110,7 @@ async function initAuthenticatedDownloads(){
 }
 $('logout-downloads').onclick=()=>{downloadToken=null;enabledNames.clear();capabilitiesLoaded=false;$('logout-downloads').style.display='none';if(downloadConfig){$('google-signin').style.display='block';google.accounts.id.disableAutoSelect()}updateDownload()};
 async function authenticatedDownload(format){
- if(!downloadConfig||!downloadToken||!selected||!enabledNames.has(selected.n))throw Error('Inicia sesión o selecciona una cobertura habilitada');
+ if(!downloadConfig||!downloadToken||!selected||!db.includes(selected)||!enabledNames.has(selected.n))throw Error('Cobertura no vigente o descarga no autorizada');
  const api=downloadConfig.apiBase.replace(/\/$/,'')+'/api/download/'+encodeURIComponent(selected.n);
  let chosenLayer=null;
  for(let attempt=0;attempt<2;attempt++){
@@ -126,9 +126,9 @@ async function authenticatedDownload(format){
  saveBlob(blob,filename);$('dlstatus').textContent='Descarga solicitada: '+filename;return}
  throw Error('No se pudo seleccionar la tabla solicitada')
 }
-function updateDownload(){if(!selected){$('gpkg').disabled=true;$('excel').disabled=true;return}const ready=!!downloadToken&&capabilitiesLoaded&&enabledNames.has(selected.n);$('gpkg').disabled=!ready;$('excel').disabled=!ready;if(!downloadConfig){$('dlstatus').textContent='Servicio de descarga privada aún no desplegado.'}else if(!downloadToken){$('dlstatus').textContent='Inicia sesión para descargar ZIP y Excel desde Drive.'}else if(!enabledNames.has(selected.n)){$('dlstatus').textContent='Esta cobertura aún no tiene enlace autorizado y verificado en el servidor.'}else{$('dlstatus').textContent='Origen identificado en Drive. ZIP y Excel sujetos a validación del archivo original.'}}
+function updateDownload(){if(!selected){$('gpkg').disabled=true;$('excel').disabled=true;return}const ready=db.includes(selected)&&!!downloadToken&&capabilitiesLoaded&&enabledNames.has(selected.n);$('gpkg').disabled=!ready;$('excel').disabled=!ready;if(!downloadConfig){$('dlstatus').textContent='Servicio de descarga privada aún no desplegado.'}else if(!downloadToken){$('dlstatus').textContent='Inicia sesión para descargar ZIP y Excel desde Drive.'}else if(!enabledNames.has(selected.n)){$('dlstatus').textContent='Esta cobertura aún no tiene enlace autorizado y verificado en el servidor.'}else{$('dlstatus').textContent='Origen identificado en Drive. ZIP y Excel sujetos a validación del archivo original.'}}
 
-async function choose(r,el){selected=r;preview=null;clearAttributes('Buscando datos de '+r.n+'…');let token=++request;document.querySelectorAll('.item.active').forEach(x=>x.classList.remove('active'));el?.classList.add('active');if(layer){map.removeLayer(layer);layer=null}
+async function choose(r,el){if(!db.includes(r))return;selected=r;preview=null;clearAttributes('Buscando datos de '+r.n+'…');let token=++request;document.querySelectorAll('.item.active').forEach(x=>x.classList.remove('active'));el?.classList.add('active');if(layer){map.removeLayer(layer);layer=null}
 window.dispatchEvent(new CustomEvent('biblioteca:coverage-selected',{detail:{coverage:r}}));
 let d=r.descripcion_capa||r.descripcion||r.desc||'';if(norm(d)===norm('Cobertura geográfica: '+r.n))d='Cobertura '+r.n+' del tema '+(r.tema||'sin clasificar')+'. El catálogo no contiene aún una descripción metodológica específica.';
 $('detail').innerHTML='<h3>'+esc(r.n)+'</h3><p><b>Tema:</b> '+esc(r.tema||'Sin clasificar')+' · <b>Dimensión:</b> '+esc(r.dim||'No informada')+'</p><p><b>Año:</b> '+esc(r.ano||'No informado')+' · <b>Geometría:</b> '+esc(geo(r.geom))+'</p><p><b>Formato original:</b> '+esc(r.formato||'No informado')+' · <b>CRS original:</b> '+esc(r.crs||'No verificado')+'</p><p><b>Registros:</b> '+esc(r.reg||'No informado')+' · <b>Estado:</b> '+esc(r.estado||'No informado')+'</p><p><b>Carpeta de inventario:</b> '+esc(r.carp||'No indicada')+'</p><div class="description"><b>Descripción de la capa</b><p>'+esc(d)+'</p></div><p class="meta"><b>Proyección recomendada:</b> '+(/[Pp]ol[ií]gono/.test(geo(r.geom))?'UTM EPSG:32719, para cálculo de áreas y distancias.':'Geográficas EPSG:4326, para localización e intercambio de coordenadas.')+' Esta indicación no reproyecta el archivo original.</p>';
